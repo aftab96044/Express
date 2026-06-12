@@ -10,7 +10,7 @@ export default function login(){
             <br/>
             <br/>
             <button>Login</button>
-            <a href='/'>Go to home</a>
+            <a href='/'>Go to home</a> 
         </form>
     `
 }
