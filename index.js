@@ -1,15 +1,22 @@
-const express = require('express')
+//const express = require('express') //vanilla js syntax
+
+import express from 'express';
+// to use this go to json and change type:common.js to module
+
+import home, {contact} from './pages/home.js';
+import about from './pages/about.js';
+
 
 const app = express();
 
 app.get("",(req, res)=>{
-    res.send("<h1>Basic node js example</h1>")
+    res.send(home())
 });
 app.get("/about",(req, res)=>{
-    res.send("<h1>This is About Page</h1>")
+    res.send(about())
 });
 app.get("/contact",(req, res)=>{
-    res.send("<h1>This is contact Page</h1>")
+    res.send(contact())
 });
 
 app.listen(2100)
