@@ -1,5 +1,5 @@
 import express from 'express'
-import { MongoClient } from 'mongodb'
+import { MongoClient, ObjectId } from 'mongodb'
 
 const dbName = "school"
 const url = "mongodb://localhost:27017"
@@ -7,6 +7,7 @@ const client = new MongoClient(url)
 
 const app = express()
 app.use(express.urlencoded({extended:true}))
+app.use(express.json())
 
 client.connect().then((connection)=>{
     const db = connection.db(dbName);
@@ -40,8 +41,72 @@ client.connect().then((connection)=>{
         // const students = await collection.find().toArray()
         console.log(req.body);
         const collection = db.collection("students")
-        const result = collection.insertOne(req.body)
+        const result = await collection.insertOne(req.body)
         res.send("data saved")
+    })
+
+    app.post("/add-student-api",async(req, res)=>{
+        console.log(req.body);
+        const {name, email, age} = req.body
+        if(!age || !name || !email){
+            res.send({message:"operation failed", success:false})
+            return false
+        }
+        const collection = db.collection("students")
+        const result = await collection.insertOne(req.body)
+        res.send({message: "data stored",success:true, result:result})
+    })
+
+    app.delete("/delete/:id",async(req, res)=>{
+        console.log(req.params.id);
+        const collection = db.collection("students")
+        const result = await collection.deleteOne({_id: new ObjectId(req.params.id)})
+        if(result){
+            res.send({
+                message:"student data deleted",
+                success:true
+            })
+        }else{
+            res.send({
+                message:"student data not deleted! try after sometime",
+                success:false
+            })
+        }
+        res.send("working")
+        
+    })
+
+    app.get("/ui/delete/:id",async(req, res)=>{
+        console.log(req.params.id);
+        const collection = db.collection("students")
+        const result = await collection.deleteOne({_id: new ObjectId(req.params.id)})
+        if(result){
+            res.send("<h1>student record deleted</h1>")
+        }else{
+            res.send("<h1>student record not deleted</h1>")
+        }
+        res.send("working")
+        
+    })
+
+    app.get("/ui/student/:id",async(req, res)=>{
+        const id = req.params.id;
+        console.log(id);
+        const collection = db.collection("students")
+        const result = await collection.findOne({_id: new ObjectId(req.params.id)})
+        res.render('update-student',{result})
+    })
+
+    app.get("/student/:id",async(req, res)=>{
+        const id = req.params.id;
+        console.log(id);
+        const collection = db.collection("students")
+        const result = await collection.findOne({_id: new ObjectId(req.params.id)})
+        res.send({
+            message: 'data fetched',
+            success:true,
+            result:result
+        })
     })
 })
  
